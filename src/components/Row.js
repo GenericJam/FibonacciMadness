@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Cell from "./Cell";
-
+// This deploys a row of cells
 export default class Row extends Component {
   render() {
     let { cells, rowCellData, rowCellColors } = this.props;

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+// All of the potential colors for the cell borders
 const borderColors = [
   "#80FF00",
   "#88EE11",
@@ -18,7 +18,7 @@ const borderColors = [
   "#F011EE",
   "#F800FF"
 ];
-
+// This is a cell which displays the state of the cell in the grid
 export default class Cell extends Component {
   clicked = () => {
     const { cellCallback, x, y } = this.props;
