@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import "./App.css";
 import Container from "./components/Container";
 
+// Specify number of cells (columns) and rows here
 class App extends Component {
   render() {
     return (
