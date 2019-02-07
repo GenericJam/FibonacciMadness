@@ -190,7 +190,6 @@ export default class Container extends Component {
   };
 
   // Check for Fibonacci Sequence
-  // lastChecked is if it is being used recursively, don't check these coordinates
   fibCheck = (x, y) => {
     const { cells } = this.props;
     const center = this.cellInfo(x + y * cells, x, y);
