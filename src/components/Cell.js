@@ -30,7 +30,7 @@ export default class Cell extends Component {
       height,
       value,
       color,
-      borderIndex = value > 16 ? 15 : value - 1
+      borderIndex = value > 15 ? 15 : value
     } = this.props;
     return (
       <span
@@ -46,7 +46,7 @@ export default class Cell extends Component {
           zIndex: 0
         }}
       >
-        <p style={{ zIndex: 99, margin: "auto", marginTop: 5 }}>{value || 1}</p>
+        <p style={{ zIndex: 99, margin: "auto", marginTop: 5 }}>{value || 0}</p>
       </span>
     );
   }

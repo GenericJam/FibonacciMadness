@@ -25,7 +25,8 @@ export default class Container extends Component {
       // Global flag whether there is currently a Fibonacci match
       isFib: false,
       automated: false,
-      fibSeq: this.genFib(0, 1, 100)
+      fibSeq: this.genFib(0, 1, 100),
+      dirty: false
     });
   }
 
@@ -114,6 +115,7 @@ export default class Container extends Component {
   cellCallback = (x, y) => {
     this.bumpCell(x, y);
   };
+
   // Just for automated testing
   autoClick = (delay, start) => {
     const { rows, cells } = this.props;
@@ -131,39 +133,30 @@ export default class Container extends Component {
 
   // Disconnected from the click event for automated testing
   bumpCell(x, y) {
+    this.setState({});
     let { cellData } = this.state;
     const { cells, rows } = this.props;
 
     this.setColors(x, y, colors.yellow);
 
-    const rowIndex = y * cells;
-    const rowEnd = (y + 1) * cells;
-    // Increment this row
-    const row = cellData.slice(rowIndex, rowEnd).map(i => i + 1);
-    cellData = [
-      ...cellData.slice(0, rowIndex),
-      ...row,
-      ...cellData.slice(rowEnd)
-    ];
+    for (let i = 0; i < cells; i++) {
+      const index = i + y * cells;
+      cellData[index]++;
+      this.fibCheck(i, y);
+    }
 
     for (let i = 0; i < rows; i++) {
       const index = x + i * cells;
       // Don't increment twice
       if (i !== y) {
-        const value = cellData[index] + 1;
-        cellData = [
-          ...cellData.slice(0, index),
-          value,
-          ...cellData.slice(index + 1)
-        ];
-      }
-
-      if (cellData[index] > 4) {
-        this.fibCheck(i, y);
+        cellData[index]++;
+        this.fibCheck(x, i);
       }
     }
-    this.setState({ cellData });
+    // Put this back in if it causes problems
+    // this.setState({ cellData });
 
+    // Set the colors back
     setTimeout(() => {
       this.setColors(x, y, colors.white);
     }, 500);
@@ -173,32 +166,21 @@ export default class Container extends Component {
   setColors = (x, y, color) => {
     let { cellColors } = this.state;
     const { rows, cells } = this.props;
-    const rowIndex = y * cells;
-    const rowEnd = (y + 1) * cells;
-    // Color this row
-    const rowColor = cellColors.slice(rowIndex, rowEnd).map(i => {
-      return color;
-    });
-    cellColors = [
-      ...cellColors.slice(0, rowIndex),
-      ...rowColor,
-      ...cellColors.slice(rowEnd)
-    ];
+
+    for (let i = 0; i < cells; i++) {
+      const index = i + y * cells;
+      cellColors[index] = color;
+    }
     for (let i = 0; i < rows; i++) {
       const index = x + i * cells;
-      cellColors = [
-        ...cellColors.slice(0, index),
-        color,
-        ...cellColors.slice(index + 1)
-      ];
+      cellColors[index] = color;
     }
-    this.setState({ cellColors });
   };
 
   initCells = () => {
     const { rows, cells } = this.props;
     const cellData = new Array(rows * cells);
-    return cellData.fill(1);
+    return cellData.fill(0);
   };
 
   initColors = () => {
@@ -215,8 +197,9 @@ export default class Container extends Component {
 
     // Not part of fib sequence early out
     if (
-      center &&
-      center.value !== this.genFib(0, 1, center.value).slice(-1)[0]
+      (center &&
+        center.value !== this.genFib(0, 1, center.value).slice(-1)[0]) ||
+      (center && center.value < 3)
     ) {
       return;
     }
@@ -253,32 +236,20 @@ export default class Container extends Component {
     fibCells.forEach(cell => {
       const index = cell.x + cell.y * cells;
 
-      cellColors = [
-        ...cellColors.slice(0, index),
-        colors.green,
-        ...cellColors.slice(index + 1)
-      ];
+      cellColors[index] = colors.green;
     });
 
-    this.setState({ cellColors, isFib: true });
+    this.setState({ isFib: true });
 
     setTimeout(() => {
       let { cellData, cellColors } = this.state;
       fibCells.forEach(cell => {
         const index = cell.x + cell.y * cells;
 
-        cellColors = [
-          ...cellColors.slice(0, index),
-          colors.white,
-          ...cellColors.slice(index + 1)
-        ];
-        cellData = [
-          ...cellData.slice(0, index),
-          1,
-          ...cellData.slice(index + 1)
-        ];
+        cellColors[index] = colors.white;
+        cellData[index] = 0;
       });
-      this.setState({ cellData, cellColors, isFib: false });
+      this.setState({ isFib: false });
     }, 1000);
   };
 
