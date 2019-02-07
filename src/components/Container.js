@@ -332,7 +332,7 @@ export default class Container extends Component {
   cellInfo = (index, x, y) => {
     const { rows, cells } = this.props;
     const { cellData } = this.state;
-    if (index >= 0 && index < rows * cells) {
+    if (index > 0 && index < rows * cells) {
       return { value: cellData[index], x: x, y: y };
     }
     return null;
