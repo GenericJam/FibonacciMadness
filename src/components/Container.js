@@ -133,7 +133,6 @@ export default class Container extends Component {
 
   // Disconnected from the click event for automated testing
   bumpCell(x, y) {
-    this.setState({});
     let { cellData } = this.state;
     const { cells, rows } = this.props;
 
@@ -155,10 +154,11 @@ export default class Container extends Component {
     }
     // Put this back in if it causes problems
     // this.setState({ cellData });
-
+    this.setState({});
     // Set the colors back
     setTimeout(() => {
       this.setColors(x, y, colors.white);
+      this.setState({});
     }, 500);
   }
 
@@ -192,12 +192,12 @@ export default class Container extends Component {
   // Check for Fibonacci Sequence
   fibCheck = (x, y) => {
     const { cells } = this.props;
+    const { fibSeq } = this.state;
     const center = this.cellInfo(x + y * cells, x, y);
 
-    // Not part of fib sequence early out
+    // Not part of fib sequence or too small early out
     if (
-      (center &&
-        center.value !== this.genFib(0, 1, center.value).slice(-1)[0]) ||
+      (center && !fibSeq.includes(center.value)) ||
       (center && center.value < 3)
     ) {
       return;
@@ -258,27 +258,27 @@ export default class Container extends Component {
     // Get adjacent cells
     const [up, down, left, right] = this.getAdjacent(center);
 
-    [up, down, left, right].forEach(i => {
-      if (!i) {
+    [up, down, left, right].forEach(cand => {
+      if (!cand) {
         return false;
       }
       const centerPos = this.findMatch(center.value, 0);
-      const candidatePos = this.findMatch(i.value, 0);
+      const candidatePos = this.findMatch(cand.value, 0);
       // First case is generic case where these are consecutive member of the sequence
       if (centerPos - 1 === candidatePos) {
-        const newCells = [...cells, i];
+        const newCells = [...cells, cand];
         this.descendFib(newCells);
       } else if (candidatePos === 1 && centerPos === 3) {
-        // Special case of 0, 1, 1 as findMatch will return the first position
-        const newCells = [...cells, i];
+        // Special case of 0, 1, 1, 2 as findMatch will return the first position
+        const newCells = [...cells, cand];
         this.descendFib(newCells);
       } else if (
         centerPos === 1 &&
         candidatePos === 1 &&
         cells.slice(-2)[0].value === 2
       ) {
-        // Special case of 0, 1, 1, 2 as findMatch will return the first position
-        const newCells = [...cells, i];
+        // Special case of 0, 1, 1 as findMatch will return the first position
+        const newCells = [...cells, cand];
         this.descendFib(newCells);
       } else {
         if (cells.length >= 5) {
@@ -332,7 +332,7 @@ export default class Container extends Component {
   cellInfo = (index, x, y) => {
     const { rows, cells } = this.props;
     const { cellData } = this.state;
-    if (index > 0 && index < rows * cells) {
+    if (index >= 0 && index < rows * cells) {
       return { value: cellData[index], x: x, y: y };
     }
     return null;
